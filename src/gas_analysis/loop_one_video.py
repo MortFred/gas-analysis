@@ -1,5 +1,7 @@
 import cv2
-from src.gas_detection import motion_detector
+from gas_analysis.gas_detection import motion_detector
+
+
 
 video = cv2.VideoCapture() ### add path to file
 

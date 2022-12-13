@@ -22,7 +22,10 @@ setup(
     include_package_data=True,
     install_requires=[
         "opencv-python",
-        "numpy"
+        "numpy",
+        "azure-storage-blob",
+        "azure-identity",
+        "python-dotenv",
     ],
     extras_require={
         "dev": [
