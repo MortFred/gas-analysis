@@ -27,10 +27,6 @@ setup(
         "azure-identity",
         "python-dotenv",
     ],
-    extras_require={
-        "dev": [
-            "black"
-        ]
-    },
+    extras_require={"dev": ["black"]},
     python_requires=">=3.10",
 )

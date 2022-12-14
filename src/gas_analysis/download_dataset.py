@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 dirname = os.path.dirname(__file__)
+local_path_noleak = os.path.join(dirname, "../../videos/results")
+if not os.path.exists(local_path_noleak):
+    os.makedirs(local_path_noleak)
 
 files_leak = ["MOV_1650.mp4", "MOV_1669.mp4"]
 local_path_leak = os.path.join(dirname, "../../videos/leak")
@@ -16,9 +19,13 @@ local_path_noleak = os.path.join(dirname, "../../videos/noleak")
 if not os.path.exists(local_path_noleak):
     os.makedirs(local_path_noleak)
 
-connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-container_client_leak = ContainerClient.from_connection_string(connect_str, "mongstad-nov-2022-leak")
-container_client_noleak = ContainerClient.from_connection_string(connect_str, "mongstad-nov-2022-noleak")
+connect_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+container_client_leak = ContainerClient.from_connection_string(
+    connect_str, "mongstad-nov-2022-leak"
+)
+container_client_noleak = ContainerClient.from_connection_string(
+    connect_str, "mongstad-nov-2022-noleak"
+)
 
 for f in files_leak:
     download_file_path = os.path.join(local_path_leak, f)
