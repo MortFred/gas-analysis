@@ -95,7 +95,7 @@ def find_pixel_motion(frame, previous_frame):
 
     # Only take different areas that are different enough (>20 / 255)
     thresh_frame = cv2.threshold(
-        src=diff_frame, thresh=3, maxval=255, type=cv2.THRESH_BINARY
+        src=diff_frame, thresh=1, maxval=255, type=cv2.THRESH_BINARY
     )[1]
     cv2.imshow(window_motion, thresh_frame)
     return thresh_frame
@@ -111,7 +111,7 @@ def draw_bounding_boxes(thresh_frame, frame):
         image=thresh_frame, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE
     )
     for contour in contours:
-        if cv2.contourArea(contour) < 5:
+        if cv2.contourArea(contour) < 50:
             # too small: skip!
             continue
         (x, y, w, h) = cv2.boundingRect(contour)

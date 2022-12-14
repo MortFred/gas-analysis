@@ -9,12 +9,12 @@ local_path_noleak = os.path.join(dirname, "../../videos/results")
 if not os.path.exists(local_path_noleak):
     os.makedirs(local_path_noleak)
 
-files_leak = ["MOV_1650.mp4", "MOV_1669.mp4"]
+files_leak = ["MOV_1650.mp4", "MOV_1669.mp4", "MOV_1544.mp4"]
 local_path_leak = os.path.join(dirname, "../../videos/leak")
 if not os.path.exists(local_path_leak):
     os.makedirs(local_path_leak)
 
-files_noleak = ["MOV_1662.mp4"]
+files_noleak = ["MOV_1662.mp4", "MOV_1543.mp4"]
 local_path_noleak = os.path.join(dirname, "../../videos/noleak")
 if not os.path.exists(local_path_noleak):
     os.makedirs(local_path_noleak)
