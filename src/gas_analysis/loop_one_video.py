@@ -3,7 +3,11 @@ import os
 from gas_analysis.gas_detection import motion_detector
 
 dirname = os.path.join(os.path.dirname(__file__), "../../videos")
-filename = os.path.join(dirname, "noleak/MOV_1543.mp4")
+# filename = os.path.join(dirname, "leak/MOV_1669.mp4")
+# filename = os.path.join(dirname, "leak/MOV_1544.mp4")
+filename = os.path.join(dirname, "leak/MOV_1546.mp4")
+# filename = os.path.join(dirname, "noleak/MOV_1541.mp4")
+# filename = os.path.join(dirname, "noleak/MOV_1662.mp4")
 
 video = cv2.VideoCapture(filename)  ### add path to file
 
