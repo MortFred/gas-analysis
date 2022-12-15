@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 
-def gas_detector(videofile, record_result=False):
+def motion_detector(videofile, record_result=False):
     window_raw = "Raw video"
     cv2.namedWindow(window_raw)
     cv2.moveWindow(window_raw, 0, 0)
@@ -14,8 +14,6 @@ def gas_detector(videofile, record_result=False):
         return
 
     previous_frame = None
-    saturated_pixels = None
-    frame_number = 0
 
     frame_width = int(videofile.get(3))
     frame_height = int(videofile.get(4))
@@ -37,22 +35,17 @@ def gas_detector(videofile, record_result=False):
 
         if ret:
             cv2.imshow(window_raw, frame)
-            prepared_frame = preprocess_frame(frame)
-            if frame_number == 0:
-                saturated_pixels = find_saturated_pixels(prepared_frame)
 
             # 2. Prepare image; grayscale and blur
-            denoised_frame = denoise_frame(
-                videofile, prepared_frame, frame_number, saturated_pixels
-            )
+            prepared_frame = preprocess_frame(frame)
 
             # Set previous frame and continue if there is None
             if previous_frame is None:
-                previous_frame = denoised_frame
+                previous_frame = prepared_frame
                 continue
 
-            thresh_frame = find_pixel_motion(denoised_frame, previous_frame)
-            previous_frame = denoised_frame
+            thresh_frame = find_pixel_motion(prepared_frame, previous_frame)
+            previous_frame = prepared_frame
 
             boxed_frame = draw_bounding_boxes(thresh_frame, frame)
 
@@ -61,8 +54,6 @@ def gas_detector(videofile, record_result=False):
                 result.write(finished_frame)
         else:
             break
-
-        frame_number += 1
 
         # press escape to exit
         if cv2.waitKey(30) == 27:
@@ -81,51 +72,10 @@ def preprocess_frame(frame):
     cv2.moveWindow(window_preprocessed, 320, 0)
 
     prepared_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    prepared_frame = cv2.GaussianBlur(src=prepared_frame, ksize=(5, 5), sigmaX=0)
 
     cv2.imshow(window_preprocessed, prepared_frame)
     return prepared_frame
-
-
-def find_saturated_pixels(frame):
-    diluted_frame = cv2.dilate(frame, np.ones((5, 5)), 1)
-    blurred_frame = cv2.GaussianBlur(src=diluted_frame, ksize=(25, 25), sigmaX=0)
-    hot_area_frame = cv2.threshold(
-        src=blurred_frame,
-        thresh=np.percentile(blurred_frame, 95),
-        maxval=255,
-        type=cv2.THRESH_BINARY,
-    )[1]
-    return hot_area_frame
-
-
-def denoise_frame(videofile, frame, frame_number, saturated_pixels):
-    window_denoised = "denoised video"
-    cv2.namedWindow(window_denoised)
-    cv2.moveWindow(window_denoised, 320, 265)
-    window_size = 5
-
-    if (
-        frame_number < window_size // 2
-        or frame_number > videofile.get(cv2.CAP_PROP_FRAME_COUNT) - window_size // 2
-    ):
-        denoised_frame = frame
-
-    else:
-        videofile.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
-        frames = [videofile.read()[1] for i in range(window_size)]
-        for i, frame in enumerate(frames):
-            frames[i] = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        frame_number_in_window = window_size // 2
-        denoised_frame = cv2.fastNlMeansDenoisingMulti(
-            srcImgs=frames,
-            imgToDenoiseIndex=frame_number_in_window,
-            temporalWindowSize=window_size,
-            h=2,
-        )
-    denoised_frame = cv2.subtract(denoised_frame, saturated_pixels)
-    cv2.imshow(window_denoised, denoised_frame)
-    return denoised_frame
 
 
 def find_pixel_motion(frame, previous_frame):
